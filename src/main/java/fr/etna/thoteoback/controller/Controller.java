@@ -7,7 +7,6 @@ import io.vertx.ext.web.Router;
  */
 public interface Controller {
 
-    public Router restAPI = null;
 
     default void launchController(Router _restAPI)
     {

@@ -1,9 +1,11 @@
 package fr.etna.thoteoback.controller;
 
+import fr.etna.thoteoback.controller.authentication.AuthController;
 import fr.etna.thoteoback.controller.users.UsersController;
 import fr.etna.thoteoback.sqlclient.Client;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 
 import java.util.ArrayList;
 
@@ -29,6 +31,7 @@ public class WebController
 
     public void initController()
     {
+        listController.add(new AuthController());
         listController.add(new UsersController());
         for (Controller c : listController)
             c.launchController(restAPI);
@@ -36,7 +39,8 @@ public class WebController
 
     public void mountWebController()
     {
-        mainRouter.mountSubRouter("/ajax", restAPI);
+        mainRouter.route("/ajax/*").handler(BodyHandler.create());
+        mainRouter.mountSubRouter("/ajax/", restAPI);
         System.out.println("mounted");
     }
 }

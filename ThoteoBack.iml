@@ -33,5 +33,7 @@
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-async:3.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:3.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:bson:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: io.reactivex.rxjava2:rxjava:2.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
   </component>
 </module>

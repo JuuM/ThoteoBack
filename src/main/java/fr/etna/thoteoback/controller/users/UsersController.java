@@ -21,7 +21,7 @@ public class UsersController implements Controller{
     public void launchController(Router rest)
     {
         rest.get("/test/:ID").handler(this::getTest);
-        System.out.println("mounted LAUNCHCONTROLLER");
+        System.out.println("mounted LAUNCHCONTROLLER" + this.getClass().getName());
     }
     public void getTest(RoutingContext routingContext){
         String ID = routingContext.request().getParam("ID");
@@ -29,4 +29,5 @@ public class UsersController implements Controller{
         if (ID != null)
             response.end("ok" + ID);
     }
+
 }
