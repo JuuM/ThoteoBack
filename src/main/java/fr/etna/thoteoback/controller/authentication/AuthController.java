@@ -9,6 +9,8 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.auth.jwt.JWTOptions;
+import io.vertx.ext.auth.jwt.JWTAuth;
 
 import java.util.ArrayList;
 
