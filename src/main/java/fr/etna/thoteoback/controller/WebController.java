@@ -4,9 +4,9 @@ import fr.etna.thoteoback.controller.authentication.AuthController;
 import fr.etna.thoteoback.controller.upload.UploadController;
 import fr.etna.thoteoback.controller.users.UsersController;
 import fr.etna.thoteoback.sqlclient.Client;
-import io.vertx.core.Vertx;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
 
 import java.util.ArrayList;
 

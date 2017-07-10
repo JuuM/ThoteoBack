@@ -1,12 +1,12 @@
 package fr.etna.thoteoback.controller.upload;
 
 import fr.etna.thoteoback.controller.Controller;
-import io.reactivex.Observable;
+import rx.Observable;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.FileUpload;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.rxjava.ext.web.FileUpload;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
 
 import java.util.ArrayList;
 

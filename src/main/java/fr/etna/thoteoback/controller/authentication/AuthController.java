@@ -3,16 +3,19 @@ package fr.etna.thoteoback.controller.authentication;
 
 import fr.etna.thoteoback.controller.Controller;
 import fr.etna.thoteoback.controller.authentication.model.AuthenticationForm;
-import io.reactivex.Observable;
-import io.vertx.core.http.HttpServerResponse;
+import fr.etna.thoteoback.model.Users;
+import fr.etna.thoteoback.sqlclient.dao.UsersDao;
+import fr.etna.thoteoback.sqlclient.dao.impl.UsersDaoImpl;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
+import rx.Observable;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.ext.auth.jwt.JWTOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AuthController  implements Controller {
 
@@ -20,15 +23,35 @@ public class AuthController  implements Controller {
     {
         super();
     }
+    public UsersDao userDao = new UsersDaoImpl("account");
+    private static HashMap<String, AuthenticationForm> jwtHash = new HashMap<>();
+    Users user = null;
 
     @Override
     public void launchController(Router rest)
     {
         rest.post("/connect").handler(this::connect);
-        //rest.get("/connect2/:ID").handler(this::test);
+        rest.post("/validKey").handler(this::validKey);
         System.out.println("mounted LAUNCHCONTROLLER" + this.getClass().getName());
     }
-    public Observable connect(RoutingContext routingContext)
+    private Observable<JsonObject> validKey(RoutingContext routingContext)
+    {
+        final AuthenticationForm form = Json.decodeValue(routingContext.getBodyAsString(),
+                AuthenticationForm.class);
+        JsonObject returnJson = new JsonObject();
+        if (jwtHash.get(form.getClef()) == null)
+            returnJson.put("result", "key undefined");
+        else if (form.getEmail().equals(jwtHash.get(form.getClef()).getEmail()))
+            returnJson.put("result", "ok");
+        else
+            returnJson.put("result", "key not matching");
+        routingContext.response()
+                .setStatusCode(200)
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(returnJson.toString());
+        return Observable.just(returnJson);
+    }
+    public void connect(RoutingContext routingContext)
     {
 
         ArrayList<String> errors = new ArrayList<>();
@@ -36,28 +59,52 @@ public class AuthController  implements Controller {
         try {
             final AuthenticationForm form = Json.decodeValue(routingContext.getBodyAsString(),
                     AuthenticationForm.class);
-            JsonObject config = new JsonObject().put("keyStore", new JsonObject()
-                    .put("path", "keystore.jceks")
-                    .put("type", "jceks")
-                    .put("password", "secret"));
-            JWTAuth provider = JWTAuth.create(io.vertx.core.Vertx.vertx(), config);
             System.out.println(form.toString());
+
             //return Observable.just("ok");
             if (form.getEmail() == null || form.getPassword() == null)
                 errors.add("undefined value");
-            /*if (!form.getEmail().equalsIgnoreCase("admin"))//TODO : Get
-                errors.add("Nom de compte invalide");
-            if (!form.getPassword().equalsIgnoreCase("1234"))
-                errors.add("Mot de passe invalide");*/
+            JsonObject json2 = new JsonObject().put("email", form.getEmail());
+            // Load company
+            userDao.findOne(json2).subscribe(user ->
+            {
+                if (user != null)
+                {
+                    if (user.getPassword().equals(form.getPassword())) {
+                        System.out.println("no null");
+                        JsonObject config = new JsonObject().put("keyStore", new JsonObject()
+                                .put("path", "keystore.jceks")
+                                .put("type", "jceks")
+                                .put("password", "secret"));
+                        JWTAuth provider = JWTAuth.create(io.vertx.core.Vertx.vertx(), config);
+                        System.out.println("====  LOGIN OK =====");
+                        String token = provider.generateToken(new JsonObject().put("sub", user.getEmail()), new JWTOptions());
+                        System.out.println("Token : " + token);
+                        jwtHash.put(token, form);
+                        json.put("result", user.toString());
+                        json.put("token", token);
+                    }
+                    else
+                        errors.add("mdp invalide");
+                } else
+                    errors.add("Undefined account");
+                if (errors.size() != 0)
+                    json.put("error", errors);
+                routingContext.response()
+                        .setStatusCode(200)
+                        .putHeader("content-type", "application/json; charset=utf-8")
+                        .end(json.toString());
+            });
+
         }catch (Exception e){
+            e.printStackTrace();
             errors.add("Not valid format");
+            json.put("error", errors);
+            routingContext.response()
+                    .setStatusCode(200)
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(json.toString());
         }
-        json.put("error", errors);
-        routingContext.response()
-                .setStatusCode(200)
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(json.toString());
-        return Observable.just(json);
     }
 
 }

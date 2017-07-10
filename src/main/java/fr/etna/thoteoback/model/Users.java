@@ -2,21 +2,33 @@ package fr.etna.thoteoback.model;
 
 public class Users {
 
-    private int _guid;
+
+    private Object _id;
     private String email;
     private String password;
     private String Key;
 
-    public int get_guid() {
-        return _guid;
+    public Object get_id() {
+        System.out.println(_id);
+        return _id;
     }
 
-    public void set_guid(int _guid) {
-        this._guid = _guid;
+    public void set_id(Object _id) {
+        this._id = _id;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    @Override
+    public String toString() {
+        return "Users{" +
+                "_id=" + _id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", Key='" + Key + '\'' +
+                '}';
     }
 
     public void setEmail(String email) {
