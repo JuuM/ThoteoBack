@@ -33,7 +33,6 @@ public abstract class GenericImplDao<T> implements GenericDao<T>
     @Override
     public Observable<List<T>> findAll()
     {
-        List<T> template = new ArrayList<>();
         return mongo.findObservable(collection, new JsonObject()).flatMap(this::deserializeObservable);
     }
     @Override

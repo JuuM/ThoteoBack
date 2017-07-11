@@ -20,6 +20,9 @@ public class UploadController implements Controller {
         @Override
         public void launchController(Router rest)
         {
+            rest.route("/blabla/:ID").handler(routingContext -> {
+                System.out.println(routingContext.pathParam("ID"));
+            });
             rest.post("/upload").handler(BodyHandler.create().setUploadsDirectory("./file-uploads"));
             rest.post("/upload").handler(this::upload);
             System.out.println("mounted LAUNCHCONTROLLER" + this.getClass().getName());

@@ -21,7 +21,7 @@ public class UsersController implements Controller{
     @Override
     public void launchController(Router rest)
     {
-        rest.get("/test/:ID").handler(this::getTest);
+        //rest.get("/test/:ID").handler(this::getTest);
         rest.post("/");
         System.out.println("mounted LAUNCHCONTROLLER" + this.getClass().getName());
     }

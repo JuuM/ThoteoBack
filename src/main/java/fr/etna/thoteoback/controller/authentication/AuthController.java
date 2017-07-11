@@ -6,13 +6,16 @@ import fr.etna.thoteoback.controller.authentication.model.AuthenticationForm;
 import fr.etna.thoteoback.model.Users;
 import fr.etna.thoteoback.sqlclient.dao.UsersDao;
 import fr.etna.thoteoback.sqlclient.dao.impl.UsersDaoImpl;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.rxjava.core.http.HttpServerResponse;
 import rx.Observable;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.ext.auth.jwt.JWTOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.core.Vertx;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,12 +30,31 @@ public class AuthController  implements Controller {
     private static HashMap<String, AuthenticationForm> jwtHash = new HashMap<>();
     Users user = null;
 
+
     @Override
     public void launchController(Router rest)
     {
+        rest.get("/t/:ID").handler(this::getTest);
         rest.post("/connect").handler(this::connect);
         rest.post("/validKey").handler(this::validKey);
         System.out.println("mounted LAUNCHCONTROLLER" + this.getClass().getName());
+    }
+    public void getTest(RoutingContext routingContext){
+        try {
+            System.out.println("in");
+            String ID = routingContext.request().getParam("ID");
+            JsonObject returnJson = new JsonObject();
+            if (ID != null)
+                returnJson.put("result", "ok" + ID);
+            routingContext.response()
+                    .setStatusCode(200)
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(returnJson.toString());
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        //return Observable.just(returnJson);
     }
     private Observable<JsonObject> validKey(RoutingContext routingContext)
     {
@@ -57,6 +79,8 @@ public class AuthController  implements Controller {
         ArrayList<String> errors = new ArrayList<>();
         JsonObject json = new JsonObject();
         try {
+            System.out.println(routingContext.getBodyAsString());
+            System.out.println(routingContext);
             final AuthenticationForm form = Json.decodeValue(routingContext.getBodyAsString(),
                     AuthenticationForm.class);
             System.out.println(form.toString());
@@ -66,6 +90,7 @@ public class AuthController  implements Controller {
                 errors.add("undefined value");
             JsonObject json2 = new JsonObject().put("email", form.getEmail());
             // Load company
+            userDao.returnTest("Test").subscribe(test -> System.out.println(test));
             userDao.findOne(json2).subscribe(user ->
             {
                 if (user != null)

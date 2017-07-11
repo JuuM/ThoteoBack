@@ -3,13 +3,17 @@ package fr.etna.thoteoback.controller;
 import fr.etna.thoteoback.controller.authentication.AuthController;
 import fr.etna.thoteoback.controller.emotion.EmotionController;
 import fr.etna.thoteoback.controller.face.FaceController;
-import fr.etna.thoteoback.controller.vision.VisionController;
 import fr.etna.thoteoback.controller.upload.UploadController;
 import fr.etna.thoteoback.controller.users.UsersController;
+import fr.etna.thoteoback.controller.vision.VisionController;
 import fr.etna.thoteoback.sqlclient.Client;
+import io.vertx.rxjava.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
+import rx.Observable;
 
 import java.util.ArrayList;
 
@@ -19,21 +23,11 @@ import java.util.ArrayList;
 public class WebController
 {
 
-    private Client client = null;
-    Router restAPI = null;
-    Router mainRouter = null;
-    ArrayList<Controller> listController = new ArrayList<>();
+    static Router router = null;
+    static ArrayList<Controller> listController = new ArrayList<>();
 
-    public WebController(Vertx _vertx, Client _client, Router _mainRouter)
-    {
-        client = _client;
-        restAPI = Router.router(_vertx);
-        mainRouter = _mainRouter;
-        initController();
-        mountWebController();
-    }
 
-    public void initController()
+    public static void initController(Router restAPI)
     {
         listController.add(new AuthController());
         listController.add(new UsersController());
@@ -43,12 +37,5 @@ public class WebController
         listController.add(new VisionController());
         for (Controller c : listController)
             c.launchController(restAPI);
-    }
-
-    public void mountWebController()
-    {
-        mainRouter.route("/ajax/*").handler(BodyHandler.create());
-        mainRouter.mountSubRouter("/ajax/", restAPI);
-        System.out.println("mounted");
     }
 }
