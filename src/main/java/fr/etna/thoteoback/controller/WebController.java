@@ -1,6 +1,7 @@
 package fr.etna.thoteoback.controller;
 
 import fr.etna.thoteoback.controller.authentication.AuthController;
+import fr.etna.thoteoback.controller.emotion.EmotionController;
 import fr.etna.thoteoback.controller.upload.UploadController;
 import fr.etna.thoteoback.controller.users.UsersController;
 import fr.etna.thoteoback.sqlclient.Client;
@@ -35,6 +36,7 @@ public class WebController
         listController.add(new AuthController());
         listController.add(new UsersController());
         listController.add(new UploadController());
+        listController.add(new EmotionController());
         for (Controller c : listController)
             c.launchController(restAPI);
     }
