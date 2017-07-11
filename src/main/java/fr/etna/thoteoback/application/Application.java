@@ -7,7 +7,9 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import io.vertx.rxjava.ext.mongo.MongoClient;
+import io.vertx.rxjava.ext.web.Route;
 import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.StaticHandler;
 import rx.Observable;
 
@@ -19,18 +21,22 @@ public class Application extends AbstractVerticle {
 
         public static void main(String[] args) {
                 Vertx vertx = Vertx.vertx();
-                vertx.deployVerticle(Application.class.getName());
+                vertx.deployVerticle(Application.class.getName(), res -> {
+                    if (res.failed())
+                        res.cause().printStackTrace();
+                });
         }
         @Override
         public void start() throws Exception {
             System.out.println(Application.class.getName());
-            final Router router = Router.router(vertx);
-            router.route("/*").handler(StaticHandler.create());
-            JsonObject config = new JsonObject()
-                    .put("db_name", "thoteo");
+            final Router mainRouter = Router.router(vertx);
+            final Router apiRouter = Router.router(vertx);
+            JsonObject config = new JsonObject().put("db_name", "thoteo");
             mongo = MongoClient.createShared(vertx, config);
             client = new Client(mongo);
-            wc = new WebController(vertx, client, router);
-            vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+            mainRouter.route("/ajax*").handler(BodyHandler.create());
+            mainRouter.mountSubRouter("/ajax", apiRouter);
+            WebController.initController(apiRouter);
+            vertx.createHttpServer().requestHandler(mainRouter::accept).listen(80);
         }
     }
