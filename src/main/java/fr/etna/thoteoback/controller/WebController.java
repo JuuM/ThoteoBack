@@ -32,9 +32,6 @@ public class WebController
         listController.add(new AuthController());
         listController.add(new UsersController());
         listController.add(new UploadController());
-        listController.add(new EmotionController());
-        listController.add(new FaceController());
-        listController.add(new VisionController());
         for (Controller c : listController)
             c.launchController(restAPI);
     }
