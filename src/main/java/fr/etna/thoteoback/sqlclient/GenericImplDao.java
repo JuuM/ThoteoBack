@@ -124,6 +124,8 @@ public abstract class GenericImplDao<T> implements GenericDao<T>
             if (object == null)
                 return Observable.just(null);
             JsonObject json = new JsonObject(Json.encode(object));
+            if (json.containsKey("_id") && json.getString("_id") == "null")
+                json.remove("_id");
             return Observable.just(json);
         } catch (Exception e) {
             return Observable.error(e);

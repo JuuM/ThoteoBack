@@ -9,16 +9,16 @@ public class AuthenticationForm
 
     private String password = null;
 
-    private String clef = null;
+    private String key = null;
 
-    public String getClef()
+    public String getKey()
     {
-        return clef;
+        return key;
     }
 
-    public void setClef(String clef)
+    public void setKey(String key)
     {
-        this.clef = clef;
+        this.key = key;
     }
 
     public String getEmail()
@@ -47,7 +47,7 @@ public class AuthenticationForm
         return "AuthenticationForm{" +
                 "email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", clef='" + clef + '\'' +
+                ", key='" + key + '\'' +
                 '}';
     }
 }

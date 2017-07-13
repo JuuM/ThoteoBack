@@ -61,9 +61,9 @@ public class AuthController  implements Controller {
         final AuthenticationForm form = Json.decodeValue(routingContext.getBodyAsString(),
                 AuthenticationForm.class);
         JsonObject returnJson = new JsonObject();
-        if (jwtHash.get(form.getClef()) == null)
+        if (jwtHash.get(form.getKey()) == null)
             returnJson.put("result", "key undefined");
-        else if (form.getEmail().equals(jwtHash.get(form.getClef()).getEmail()))
+        else if (form.getEmail().equals(jwtHash.get(form.getKey()).getEmail()))
             returnJson.put("result", "ok");
         else
             returnJson.put("result", "key not matching");
@@ -89,8 +89,8 @@ public class AuthController  implements Controller {
             if (form.getEmail() == null || form.getPassword() == null)
                 errors.add("undefined value");
             JsonObject json2 = new JsonObject().put("email", form.getEmail());
-            // Load company
-            userDao.returnTest("Test").subscribe(test -> System.out.println(test));
+            /*// Load company
+            userDao.returnTest("Test").subscribe(test -> System.out.println(test));*/
             userDao.findOne(json2).subscribe(user ->
             {
                 if (user != null)
@@ -106,19 +106,27 @@ public class AuthController  implements Controller {
                         String token = provider.generateToken(new JsonObject().put("sub", user.getEmail()), new JWTOptions());
                         System.out.println("Token : " + token);
                         jwtHash.put(token, form);
-                        json.put("result", user.toString());
-                        json.put("token", token);
+                        user.setKey(token);
                     }
                     else
                         errors.add("mdp invalide");
                 } else
                     errors.add("Undefined account");
+
+                StringBuilder str = new StringBuilder();
+                for (String error : errors) {
+                    if (str.length() != 0)
+                        str.append("\n");
+                    str.append(error);
+                }
+                String returnJson = "";
                 if (errors.size() != 0)
-                    json.put("error", errors);
+                    json.put("error", str.toString());
+                returnJson = json.size() != 0 ? json.toString() : user.serialize().toString();
                 routingContext.response()
                         .setStatusCode(200)
                         .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(json.toString());
+                        .end(returnJson);
             });
 
         }catch (Exception e){

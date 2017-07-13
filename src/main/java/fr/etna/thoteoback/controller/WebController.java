@@ -22,13 +22,13 @@ import java.util.ArrayList;
  */
 public class WebController
 {
-
     static Router router = null;
     static ArrayList<Controller> listController = new ArrayList<>();
 
-
     public static void initController(Router restAPI)
     {
+        restAPI.get("/verify").handler(context -> {
+            context.response().setStatusCode(200).end("ok");});
         listController.add(new AuthController());
         listController.add(new UsersController());
         listController.add(new UploadController());
